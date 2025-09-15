@@ -8,42 +8,41 @@ ATTRIBUTIONS:
 
 openai
 https://github.com/openai/openai-python
-
 License: Apache 2.0
 https://github.com/openai/openai-python/blob/main/LICENSE
+
 matplotlib
 https://github.com/matplotlib/matplotlib
-
 License: Matplotlib (PSF-based)
 https://github.com/matplotlib/matplotlib/blob/main/LICENSE
+
 requests
 https://github.com/psf/requests
-
 License: Apache 2.0
 https://github.com/psf/requests/blob/main/LICENSE
+
 numpy
 https://github.com/numpy/numpy
-
 License: BSD-3-Clause
 https://github.com/numpy/numpy/blob/main/LICENSE.txt
+
 pandas
 https://github.com/pandas-dev/pandas
-
 License: BSD-3-Clause
 https://github.com/pandas-dev/pandas/blob/main/LICENSE
+
 plotly
 https://github.com/plotly/plotly.py
-
 License: MIT
 https://github.com/plotly/plotly.py/blob/master/LICENSE.txt
+
 seaborn
 https://github.com/mwaskom/seaborn
-
 License: BSD-3-Clause
 https://github.com/mwaskom/seaborn/blob/master/LICENSE
+
 streamlit
 https://github.com/streamlit/streamlit
-
 License: Apache 2.0
 
 
