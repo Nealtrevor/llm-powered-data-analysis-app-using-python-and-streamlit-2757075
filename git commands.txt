@@ -1,0 +1,10 @@
+git commands
+
+echo "# llm-powered-data-analysis-app-using-python-and-streamlit-2757075" >> README.md
+git init
+git add .
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/Nealtrevor/llm-powered-data-analysis-app-using-python-and-streamlit-2757075.git
+git push -u origin main
+git remote -v
