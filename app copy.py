@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # Initialize OpenAI client
-client = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+client = openai.OpenAI(api_key=st.secrets['OPENAI_API_KEY'])
 
 # Helper function for export
 def export_conversation():
