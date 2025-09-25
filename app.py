@@ -132,6 +132,19 @@ if st.session_state.df is not None:
             message_placeholder = st.empty()
             with st.spinner("Analyzing your data..."):
                 try:
+                    # Get conversation history for context
+                    messages = [{"role": "system", "content": system_prompt}]
+                    
+                    # Include last 3 exchanges for context
+                    for msg in st.session_state.messages[-6:]:
+                        content = msg["content"]
+                        # Truncate long messages in history to save tokens
+                        if len(content) > 500:
+                            content = content[:500] + "..."
+                        messages.append({"role": msg["role"], "content": content})
+                    
+                    messages.append({"role": "user", "content": user_input})
+                    #   Call OpenAI API
                     response = client.chat.completions.create(
                         model="gpt-4.1",
                         messages=[

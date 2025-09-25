@@ -13,3 +13,6 @@ git remote -v
 
 git pull
 git fetch
+
+git stash
+git stash clear
