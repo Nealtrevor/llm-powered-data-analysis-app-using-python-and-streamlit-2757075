@@ -10,3 +10,6 @@ git push -u origin main
 
 git remote set-url origin https://github.com/Nealtrevor/llm-powered-data-analysis-app-using-python-and-streamlit-2757075.git
 git remote -v
+
+git pull
+git fetch

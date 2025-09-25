@@ -82,6 +82,7 @@ if st.session_state.df is not None:
         # Display user message
         with st.chat_message("user"):
             st.markdown(user_input)
+
         
         # Prepare data context with token optimization
         df = st.session_state.df
@@ -126,27 +127,101 @@ if st.session_state.df is not None:
         - Always add titles and labels to plots
         """
         
-        # Generate response
+         # Generate response
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             with st.spinner("Analyzing your data..."):
-             
-                # Get conversation history for context
-                messages = [{"role": "system", "content": system_prompt}]
-                
-                # Include last 3 exchanges for context
-                for msg in st.session_state.messages[-6:]:
-                    content = msg["content"]
-                    # Truncate long messages in history to save tokens
-                    if len(content) > 500:
-                        content = content[:500] + "..."
-                    messages.append({"role": msg["role"], "content": content})
-                
-                messages.append({"role": "user", "content": user_input})
-                
-            
-                
-                # Try to execute any code in the response
+                try:
+                    response = client.chat.completions.create(
+                        model="gpt-4.1",
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_input}
+                        ],
+                        temperature=0.1,
+                        max_tokens=1500
+                    )
+                    
+                    reply = response.choices[0].message.content
+                    message_placeholder.markdown(reply)
+
+                    ## Try to execute any code in the response
+                    if "```python" in reply:
+                        code_blocks = reply.split("```python")
+                        for i in range(1, len(code_blocks)):
+                            code = code_blocks[i].split("```")[0]
+                            
+                            try:
+                                # Capture warnings
+                                with warnings.catch_warnings(record=True) as w:
+                                    warnings.simplefilter("always")
+                                    
+                                    # Create figure for potential plots
+                                    plt.figure(figsize=(10, 6))
+                                    
+                                    # Execute code in controlled environment
+                                    exec_globals = {
+                                        "df": df,
+                                        "pd": pd,
+                                        "plt": plt,
+                                        "sns": sns,
+                                        "st": st
+                                    }
+                                    
+                                    exec(code.strip(), exec_globals)
+                                    
+                                    # Display any warnings
+                                    if w:
+                                        for warning in w:
+                                            st.info(f"Note: {warning.message}")
+                                    
+                                    # Display plot if created
+                                    fig = plt.gcf()
+                                    if fig.get_axes():
+                                        st.pyplot(fig)
+                                        # Save figure in message for persistence
+                                        st.session_state.messages.append({
+                                            "role": "assistant",
+                                            "content": reply,
+                                            "figure": fig
+                                        })
+                                    else:
+                                        st.session_state.messages.append({
+                                            "role": "assistant",
+                                            "content": reply
+                                        })
+                                    
+                                    plt.close()
+                                
+                            except Exception as e:
+                                error_type = type(e).__name__
+                                st.error(f"Code execution failed: {error_type}")
+                                
+                                # Provide helpful context based on error type
+                                if "NameError" in str(e):
+                                    st.info("This might mean a column name is misspelled or doesn't exist.")
+                                elif "TypeError" in str(e):
+                                    st.info("This often happens when trying to plot non-numeric data.")
+                                elif "KeyError" in str(e):
+                                    st.info("The specified column might not exist in your dataset.")
+                                else:
+                                    st.info("Try rephrasing your question or check your data format.")
+                                
+                                st.code(code, language="python")
+                    else:
+                        # No code in response
+                        st.session_state.messages.append({
+                            "role": "assistant",
+                            "content": reply
+                        })
+                    
+                    
+                except openai.APIError as e:
+                    st.error(f"OpenAI API Error: {str(e)}")
+                    st.info("Please check your API key and try again.")
+                except Exception as e:
+                    st.error(f"Error generating response: {str(e)}")
+                    st.info("Please try again or rephrase your question.")
 
 else:
     # No data uploaded state
@@ -163,3 +238,12 @@ else:
         - What's the average value by month?
         - Are there any outliers in the price column?
         """)
+
+# Footer with tips
+st.markdown("---")
+st.markdown("""
+<div style='text-align: center; color: gray; font-size: 12px;'>
+💡 Tip: Be specific with your questions for better results | 
+🔒 Your data stays private and is not stored
+</div>
+""", unsafe_allow_html=True)
