@@ -1,2 +1,3 @@
 How to run strealit app:
 python -m streamlit run app.py
+python -m streamlit run app_final.py
