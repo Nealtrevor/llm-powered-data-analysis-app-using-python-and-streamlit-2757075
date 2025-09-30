@@ -10,7 +10,7 @@ from io import BytesIO
 
 
 st.set_page_config(
-    page_title="OpenAI Data Analyzer",
+    page_title="OpenAI CSV Data Analysis",
     page_icon="📊",
     layout="wide"
 )
@@ -84,23 +84,17 @@ if "df" not in st.session_state:
 if "data_summary" not in st.session_state:
     st.session_state.data_summary = None
 
-st.title("📊 OpenAI Data Analyzer")
+st.title("📊 OpenAI CSV Data Analysis")
 st.markdown("Upload your data and ask questions in plain English!  Powered by OpenAI's GPT-4.1. Pre prompted for better data analysis.")
 
 # Sidebar for file upload
 with st.sidebar:
     st.header("📁 Data Upload")
-    uploaded_file = st.file_uploader("Upload a CSV or Excel file", type=["csv", "xlsx", "xls"])
+    uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
     
     if uploaded_file:
         try:
-            file_name = uploaded_file.name.lower()
-            if file_name.endswith(".csv"):
-                df = pd.read_csv(uploaded_file)
-            elif file_name.endswith(".xlsx") or file_name.endswith(".xls"):
-                df = pd.read_excel(uploaded_file)
-            else:
-                raise ValueError("Unsupported file type. Please upload a .csv, .xlsx, or .xls file.")
+            df = pd.read_csv(uploaded_file)
             st.session_state.df = df
             
             # Create data summary for token optimization
@@ -128,14 +122,11 @@ with st.sidebar:
                     st.metric("Memory Usage", f"{df.memory_usage().sum() / 1024:.1f} KB")
                     st.metric("Missing Values", df.isnull().sum().sum())
                     
-        except ImportError as e:
-            st.error(f"Missing Excel reader dependency: {e}")
-            st.info("To read Excel files, install 'openpyxl' for .xlsx or 'xlrd==1.2.0' for .xls.")
         except Exception as e:
             st.error(f"Error reading file: {str(e)}")
-            st.info("Please make sure your file is a valid CSV or Excel format.")
+            st.info("Please make sure your file is a valid CSV format.")
     else:
-        st.info("👆 Upload a CSV or Excel file to start analyzing!")
+        st.info("👆 Upload a CSV file to start analyzing!")
     
     # Export options (only show if there are messages)
     if st.session_state.messages:
@@ -192,7 +183,7 @@ if st.session_state.df is not None:
         # Enhanced system prompt
         system_prompt = f"""You are a helpful data analyst assistant. 
         
-        The user has uploaded a dataset with the following information:
+        The user has uploaded a CSV file with the following information:
         {data_context}
         
         The data is loaded in a pandas DataFrame called `df`.
@@ -324,7 +315,7 @@ else:
     # No data uploaded state
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.info("👈 Please upload a CSV or Excel file to start")
+        st.info("👈 Please upload a CSV file to start")
         
         # Example questions
         st.markdown("### 💡 Example questions you can ask:")
