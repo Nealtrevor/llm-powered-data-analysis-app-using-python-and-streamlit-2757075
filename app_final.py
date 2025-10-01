@@ -254,6 +254,10 @@ if st.session_state.df is not None:
                                 # Capture warnings
                                 with warnings.catch_warnings(record=True) as w:
                                     warnings.simplefilter("always")
+                                    warnings.filterwarnings(
+                                        "ignore",
+                                        message=r".*(FigureCanvasAgg is non-interactive|Matplotlib is currently using agg).*"
+                                    )
                                     
                                     # Create figure for potential plots
                                     plt.figure(figsize=(10, 6))
